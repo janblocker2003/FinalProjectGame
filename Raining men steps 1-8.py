@@ -12,6 +12,7 @@ class Men(simpleGE.Sprite):
         self.reset()
         
     def reset(self):
+        
         self.y = 10
         self.x = random.randint(0, self.screenWidth)
         self.dy = random.randint(3, 8)
@@ -35,6 +36,36 @@ class BadGuy(simpleGE.Sprite):
         if self.bottom > self.screenHeight:
             self.reset()
 
+class MoreTime(simpleGE.Sprite):
+    def __init__(self, scene):
+        super().__init__(scene)
+        self.colorRect("black", (20, 20))
+        self.reset()
+        
+    def reset(self):
+        self.y = 10
+        self.x = random.randint(0, self.screenWidth)
+        self.dy = random.randint(4, 8)
+    
+    def checkBounds(self):
+        if self.bottom > self.screenHeight:
+            self.reset()
+
+class Wing(simpleGE.Sprite):
+    def __init__(self, scene):
+        super().__init__(scene)
+        self.colorRect("green", (25, 35))
+        self.reset()
+        
+    def reset(self):
+        self.y = 10
+        self.x = random.randint(0, self.screenWidth)
+        self.dy = random.randint(4, 8)
+        
+    def checkBounds(self):
+        if self.bottom > self.screenHeight:
+            self.reset()
+        
 class Guy(simpleGE.Sprite):
     def __init__(self, scene):
         super().__init__(scene)
@@ -60,6 +91,14 @@ class LblTime(simpleGE.Label):
         super().__init__()
         self.text = "Time left: 10"
         self.center = (500, 30)
+        self.clearBack = True
+
+class LblFlyTime(simpleGE.Label):
+    def __init__(self):
+        super().__init__()
+        self.text = "Fly Time: 0"
+        self.center = (500, 130)
+        self.clearBack = True
 
 class Game(simpleGE.Scene):
     def __init__(self):
@@ -71,12 +110,27 @@ class Game(simpleGE.Scene):
         self.numBadGuys = 3
         self.sndBadGuy = simpleGE.Sound("scream.mp3")
         
+        self.numMoreTimes = 1
+        
+        self.numWings = 1
+        
         self.score = 0
         self.lblScore = LblScore()
         
         self.timer = simpleGE.Timer()
         self.timer.totalTime = 20
         self.lblTime = LblTime()
+        
+        self.flyTimer = simpleGE.Timer()
+        self.flyTimer.totalTime = 0
+        self.lblFlyTime = LblFlyTime()
+        self.lblFlyTime.visible = False
+        
+        #(use self.lilFlyTime.hide) and self.lblFlyTime.show)
+        # hide(self) and show(self) functions of SimpleGE.Label class
+        
+        #self.moreTimer = simpleGE.Timer()
+        #self.moreTimer.totalTime = 3
         
         self.guy = Guy(self)
         
@@ -88,11 +142,22 @@ class Game(simpleGE.Scene):
         for i in range(self.numBadGuys):
             self.badGuys.append(BadGuy(self))
         
+        self.moreTimes = []
+        for i in range(self.numMoreTimes):
+            self.moreTimes.append(MoreTime(self))
+        
+        self.wings = []
+        for i in range(self.numWings):
+            self.wings.append(Wing(self))
+        
         self.sprites = [self.guy,
                         self.mens,
                         self.lblScore,
                         self.lblTime,
-                        self.badGuys]
+                        self.lblFlyTime,
+                        self.badGuys,
+                        self.moreTimes,
+                        self.wings]
 
     def process(self):
         for men in self.mens:
@@ -108,6 +173,40 @@ class Game(simpleGE.Scene):
                 badGuy.reset()
                 self.score -= 1
                 self.lblScore.text = f"Score: {self.score}"
+        
+        
+        #if self.moreTimer.getTimeLeft() <= 0:
+            #if random.randint(0, 2) == 0:
+                #self.numMoreTimes = 1
+                #for moreTime in self.moreTimes:
+                    #moreTime.reset()
+            #else:
+                #self.numMoreTimes = 0
+            #self.moreTimer.totalTime += 3
+                
+        for moreTime in self.moreTimes:
+            if moreTime.collidesWith(self.guy):
+                #self.snd???????.play()
+                moreTime.reset()
+                self.timer.totalTime += 2
+                self.lblTime.text = f"{self.timer.getTimeLeft():.2f}"
+          
+        for wing in self.wings:
+            if wing.collidesWith(self.guy):
+                #self.snd???????.play()
+                wing.reset()
+                selfl.lblFlyTime.visivle = True 
+                if self.flyTimer.totalTime < 0:
+                    self.flyTimer.totalTime = 0
+                self.flyTimer.totalTime += 4
+                self.lblFlyTime.text = f"{self.flyTimer.getTimeLeft():.2f}"
+                #self.gravity = False
+        
+        self.lblFlyTime.text = f"Fly Time: {self.flyTimer.getTimeLeft():.2f}"
+        if self.flyTimer.getTimeLeft() < 0:
+            #self.gravity = True
+            self.lblFlyTime.visible = False
+            
         
         self.lblTime.text = f"Time Left: {self.timer.getTimeLeft():.2f}"
         if self.timer.getTimeLeft() < 0:
