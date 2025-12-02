@@ -97,8 +97,19 @@ class LblFlyTime(simpleGE.Label):
     def __init__(self):
         super().__init__()
         self.text = "Fly Time: 0"
-        self.center = (500, 130)
+        self.center = (500, 65)
+        #taking this away hides at fisrt, but then won't hide after 0
         self.clearBack = True
+    
+    def hide(self):
+        self.oldPosition = self.center
+        self.center = (-1000, -1000)
+    
+    def show(self):
+        try:
+            self.center = self.oldPosition
+        except:
+            self.center = (500, 65)
 
 class Game(simpleGE.Scene):
     def __init__(self):
@@ -124,7 +135,13 @@ class Game(simpleGE.Scene):
         self.flyTimer = simpleGE.Timer()
         self.flyTimer.totalTime = 0
         self.lblFlyTime = LblFlyTime()
-        self.lblFlyTime.visible = False
+        #self.lblFlyTime.show()
+        
+        #hideLbl = LblFlyTime()
+        #hideLbl.hide()
+        
+        #lblFlyTimeCall = LblFlyTime()
+        #lblFlyTimeCall.hide()
         
         #(use self.lilFlyTime.hide) and self.lblFlyTime.show)
         # hide(self) and show(self) functions of SimpleGE.Label class
@@ -195,7 +212,11 @@ class Game(simpleGE.Scene):
             if wing.collidesWith(self.guy):
                 #self.snd???????.play()
                 wing.reset()
-                selfl.lblFlyTime.visivle = True 
+                #self.lblFlyTime.visible = True
+                #showLbl = LblFlyTime()
+                #showLbl.show()
+                self.lblFlyTime = LblFlyTime()
+                self.lblFlyTime.show()
                 if self.flyTimer.totalTime < 0:
                     self.flyTimer.totalTime = 0
                 self.flyTimer.totalTime += 4
@@ -203,10 +224,15 @@ class Game(simpleGE.Scene):
                 #self.gravity = False
         
         self.lblFlyTime.text = f"Fly Time: {self.flyTimer.getTimeLeft():.2f}"
-        if self.flyTimer.getTimeLeft() < 0:
+        if self.flyTimer.getTimeLeft() <= 0:
             #self.gravity = True
-            self.lblFlyTime.visible = False
-            
+            #self.lblFlyTime.visible = False
+            #hideLbl = LblFlyTime()
+            #hideLbl.hide()
+            self.lblFlyTime = LblFlyTime()
+            self.lblFlyTime.hide()
+        else:
+            self.lblFlyTime.text = f"Fly Time: {self.flyTimer.getTimeLeft():.2f}"
         
         self.lblTime.text = f"Time Left: {self.timer.getTimeLeft():.2f}"
         if self.timer.getTimeLeft() < 0:
