@@ -53,16 +53,24 @@ class MoreTime(simpleGE.Sprite):
 class Guy(simpleGE.Sprite):
     def __init__(self, scene):
         super().__init__(scene)
-        self.setImage("Guy.gif")
+        self.images = {
+            "left":   pygame.image.load("GuyLeftSmall.gif"),
+            "right":  pygame.image.load("GuyRightSmall.gif")}
         self.setSize(35, 45)
         self.position = (320, 400)
         self.moveSpeed = 7
+        self.copyImage(self.images["right"])
     
     def process(self):
+        self.copyImage(self.images["right"])
         if self.isKeyPressed(pygame.K_LEFT):
             self.x -= self.moveSpeed
+            self.copyImage(self.images["left"])
+            
         if self.isKeyPressed(pygame.K_RIGHT):
             self.x += self.moveSpeed
+            self.copyImage(self.images["right"])
+            
 
 class LblScore(simpleGE.Label):
     def __init__(self):
