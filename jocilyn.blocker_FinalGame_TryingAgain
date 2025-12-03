@@ -8,7 +8,7 @@ class Men(simpleGE.Sprite):
     def __init__(self, scene):
         super().__init__(scene)
         self.setImage("Men.png")
-        self.setSize(25, 35)
+        self.setSize(30, 35)
         self.reset()
         
     def reset(self):
@@ -23,7 +23,8 @@ class Men(simpleGE.Sprite):
 class BadGuy(simpleGE.Sprite):
     def __init__(self,scene):
         super().__init__(scene)
-        self.colorRect("white", (25, 35))
+        self.setImage("BadGuy.png")
+        self.setSize(30, 35)
         self.reset()
     
     def reset(self):
@@ -38,7 +39,8 @@ class BadGuy(simpleGE.Sprite):
 class MoreTime(simpleGE.Sprite):
     def __init__(self, scene):
         super().__init__(scene)
-        self.colorRect("black", (20, 20))
+        self.setImage("clock.png")
+        self.setSize(25, 25)
         self.reset()
         
     def reset(self):
@@ -92,9 +94,10 @@ class Game(simpleGE.Scene):
         self.numMens = 10
         
         self.numBadGuys = 3
-        self.sndBadGuy = simpleGE.Sound("scream.mp3")
+        self.sndBadGuy = simpleGE.Sound("rock_breaking.flac")
         
         self.numMoreTimes = 1
+        self.sndMoreTime = simpleGE.Sound("alarm.ogg")
         
         self.score = 0
         self.lblScore = LblScore()
@@ -141,7 +144,7 @@ class Game(simpleGE.Scene):
         
         for moreTime in self.moreTimes:
             if moreTime.collidesWith(self.guy):
-                #self.snd???????.play()
+                self.sndMoreTime.play()
                 moreTime.reset()
                 self.timer.totalTime += 2
                 self.lblTime.text = f"Time Left: {self.timer.getTimeLeft():.2f}"
@@ -164,7 +167,8 @@ class Instructions(simpleGE.Scene):
         "You are a guy on vacation.",
         "Move with the left and right arrow keys.",
         "Build your roster by catching as many men",
-        "as possible in your time provided.",
+        "as possible in your time provided. Catch",
+        "clocks for more time and avoid the old creeps!"
         "",
         "Good Luck!"]
         
