@@ -75,26 +75,29 @@ class Guy(simpleGE.Sprite):
         self.moveSpeed = 7
     
     def process(self):
-        if self.isKeyPressed(pygame.K_LEFT):
-            self.x -= self.moveSpeed
-        if self.isKeyPressed(pygame.K_RIGHT):
-            self.x += self.moveSpeed
-#        newGravity = Game()
-#         if newGravity.gravity == True:
+        #newGravity = Game()
+        #if newGravity.gravity == True:    #this specific line causes the crashing
+        newFlyTimer = Game()
+        if newFlyTimer.flyTimer.getTimeLeft() <= 0:
+            self.y = 400
+            if self.isKeyPressed(pygame.K_LEFT):
+                self.x -= self.moveSpeed
+            if self.isKeyPressed(pygame.K_RIGHT):
+                self.x += self.moveSpeed
 #             if self.y < 360:
-#                 self.addForce(.1, 270)
+#             self.addForce(.1, 270)
 #             if self.scene.isKeyPressed(pygame.K_UP):
 #                 self.dy = 0
 #                 self.addForce(5, 90)
         else:
             if self.isKeyPressed(pygame.K_LEFT):
-                self.turnBy(5)
+                self.x -= self.moveSpeed
             if self.isKeyPressed(pygame.K_RIGHT):
-                self.turnBy(-5)
+                self.x += self.moveSpeed
             if self.isKeyPressed(pygame.K_UP):
-                self.forward(5)
+                self.y -= self.moveSpeed
             if self.isKeyPressed(pygame.K_DOWN):
-                self.forward(-3)
+                self.y += self.moveSpeed
         #if self.y <= 0:
             
          
@@ -151,15 +154,14 @@ class Game(simpleGE.Scene):
         self.lblTime = LblTime()
         
         self.flyTimer = simpleGE.Timer()
-        self.flyTimer.totalTime = 0       ####initializing timer works
+        self.flyTimer.totalTime = 5       ####initializing timer works
         self.lblFlyTime = LblFlyTime()
         #self.lblFlyTime.show()
         
         hideLbl = LblFlyTime()   ###3this isnt working
         hideLbl.hide()
         
-        gravity = True
-        self.gravity = True
+        #self.gravity = True
         
         #(use self.lilFlyTime.hide) and self.lblFlyTime.show)
         # hide(self) and show(self) functions of SimpleGE.Label class
@@ -224,7 +226,7 @@ class Game(simpleGE.Scene):
                 #self.snd???????.play()
                 moreTime.reset()
                 self.timer.totalTime += 2
-                self.lblTime.text = f"{self.timer.getTimeLeft():.2f}"
+                self.lblTime.text = f"Time Left: {self.timer.getTimeLeft():.2f}"
           
         for wing in self.wings:
             if wing.collidesWith(self.guy):
@@ -236,25 +238,24 @@ class Game(simpleGE.Scene):
                 #self.lblFlyTime = LblFlyTime()
                 #self.lblFlyTime.show()
                 if self.flyTimer.totalTime <= 0:
-                    self.flyTimer.totalTime == 0
-                    self.flyTimer.totalTime += 4
+                    self.flyTimer.totalTime = 4
                 else:
                     self.flyTimer.totalTime += 4
-                self.lblFlyTime.text = f"{self.flyTimer.getTimeLeft():.2f}"
-                gravity = False
+                self.lblFlyTime.text = f"Fly Time: {self.flyTimer.getTimeLeft():.2f}"
+                #gravity = False
         
         self.lblFlyTime.text = f"Fly Time: {self.flyTimer.getTimeLeft():.2f}"
         
         
         #!!!!BROKEN BELOW!!!
         
-        if self.flyTimer.getTimeLeft() <= 0:
-            gravity = True
+#         if self.flyTimer.getTimeLeft() <= 0:
+#             #gravity = True
 #             #self.lblFlyTime.visible = False
 #             #hideLbl = LblFlyTime()
 #             #hideLbl.hide()
-#             self.lblFlyTime = LblFlyTime()
-#             self.lblFlyTime.hide()
+#              self.lblFlyTime = LblFlyTime()
+#              self.lblFlyTime.hide()
 #         else:
 #             self.lblFlyTime.text = f"Fly Time: {self.flyTimer.getTimeLeft():.2f}"
 #         
