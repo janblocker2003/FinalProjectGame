@@ -79,6 +79,25 @@ class Guy(simpleGE.Sprite):
             self.x -= self.moveSpeed
         if self.isKeyPressed(pygame.K_RIGHT):
             self.x += self.moveSpeed
+#        newGravity = Game()
+#         if newGravity.gravity == True:
+#             if self.y < 360:
+#                 self.addForce(.1, 270)
+#             if self.scene.isKeyPressed(pygame.K_UP):
+#                 self.dy = 0
+#                 self.addForce(5, 90)
+        else:
+            if self.isKeyPressed(pygame.K_LEFT):
+                self.turnBy(5)
+            if self.isKeyPressed(pygame.K_RIGHT):
+                self.turnBy(-5)
+            if self.isKeyPressed(pygame.K_UP):
+                self.forward(5)
+            if self.isKeyPressed(pygame.K_DOWN):
+                self.forward(-3)
+        #if self.y <= 0:
+            
+         
 
 class LblScore(simpleGE.Label):
     def __init__(self):
@@ -98,7 +117,6 @@ class LblFlyTime(simpleGE.Label):
         super().__init__()
         self.text = "Fly Time: 0"
         self.center = (500, 65)
-        #taking this away hides at fisrt, but then won't hide after 0
         self.clearBack = True
     
     def hide(self):
@@ -133,15 +151,15 @@ class Game(simpleGE.Scene):
         self.lblTime = LblTime()
         
         self.flyTimer = simpleGE.Timer()
-        self.flyTimer.totalTime = 0
+        self.flyTimer.totalTime = 0       ####initializing timer works
         self.lblFlyTime = LblFlyTime()
         #self.lblFlyTime.show()
         
-        #hideLbl = LblFlyTime()
-        #hideLbl.hide()
+        hideLbl = LblFlyTime()   ###3this isnt working
+        hideLbl.hide()
         
-        #lblFlyTimeCall = LblFlyTime()
-        #lblFlyTimeCall.hide()
+        gravity = True
+        self.gravity = True
         
         #(use self.lilFlyTime.hide) and self.lblFlyTime.show)
         # hide(self) and show(self) functions of SimpleGE.Label class
@@ -213,27 +231,33 @@ class Game(simpleGE.Scene):
                 #self.snd???????.play()
                 wing.reset()
                 #self.lblFlyTime.visible = True
-                #showLbl = LblFlyTime()
-                #showLbl.show()
-                self.lblFlyTime = LblFlyTime()
-                self.lblFlyTime.show()
-                if self.flyTimer.totalTime < 0:
-                    self.flyTimer.totalTime = 0
-                self.flyTimer.totalTime += 4
+                showLbl = LblFlyTime()
+                showLbl.show()
+                #self.lblFlyTime = LblFlyTime()
+                #self.lblFlyTime.show()
+                if self.flyTimer.totalTime <= 0:
+                    self.flyTimer.totalTime == 0
+                    self.flyTimer.totalTime += 4
+                else:
+                    self.flyTimer.totalTime += 4
                 self.lblFlyTime.text = f"{self.flyTimer.getTimeLeft():.2f}"
-                #self.gravity = False
+                gravity = False
         
         self.lblFlyTime.text = f"Fly Time: {self.flyTimer.getTimeLeft():.2f}"
-        if self.flyTimer.getTimeLeft() <= 0:
-            #self.gravity = True
-            #self.lblFlyTime.visible = False
-            #hideLbl = LblFlyTime()
-            #hideLbl.hide()
-            self.lblFlyTime = LblFlyTime()
-            self.lblFlyTime.hide()
-        else:
-            self.lblFlyTime.text = f"Fly Time: {self.flyTimer.getTimeLeft():.2f}"
         
+        
+        #!!!!BROKEN BELOW!!!
+        
+        if self.flyTimer.getTimeLeft() <= 0:
+            gravity = True
+#             #self.lblFlyTime.visible = False
+#             #hideLbl = LblFlyTime()
+#             #hideLbl.hide()
+#             self.lblFlyTime = LblFlyTime()
+#             self.lblFlyTime.hide()
+#         else:
+#             self.lblFlyTime.text = f"Fly Time: {self.flyTimer.getTimeLeft():.2f}"
+#         
         self.lblTime.text = f"Time Left: {self.timer.getTimeLeft():.2f}"
         if self.timer.getTimeLeft() < 0:
             self.stop()
