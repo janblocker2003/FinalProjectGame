@@ -80,6 +80,13 @@ class LblScore(simpleGE.Label):
         self.text = "Score: 0"
         self.center = (100, 30)
 
+class LblHighScore(simpleGE.Label):
+    def __init__(self, highScore):
+        super().__init__()
+        self.highScore = highScore
+        self.text = f"High Score: {self.highScore}"
+        self.center = (100, 50)
+
 class LblTime(simpleGE.Label):
     def __init__(self):
         super().__init__()
@@ -87,7 +94,7 @@ class LblTime(simpleGE.Label):
         self.center = (500, 30)
 
 class Game(simpleGE.Scene):
-    def __init__(self):
+    def __init__(self, highScore):
         super().__init__()
         self.setImage("Beach.png")
         self.sndMen = simpleGE.Sound("DohSound.wav")
@@ -101,6 +108,8 @@ class Game(simpleGE.Scene):
         
         self.score = 0
         self.lblScore = LblScore()
+        self.highScore = highScore
+        self.lblHighScore = LblHighScore(highScore)
         
         self.timer = simpleGE.Timer()
         self.timer.totalTime = 20
@@ -125,7 +134,8 @@ class Game(simpleGE.Scene):
                         self.lblScore,
                         self.lblTime,
                         self.badGuys,
-                        self.moreTimes]
+                        self.moreTimes,
+                        self.lblHighScore]
 
     def process(self):
         for men in self.mens:
@@ -154,10 +164,11 @@ class Game(simpleGE.Scene):
             self.stop()
 
 class Instructions(simpleGE.Scene):
-    def __init__(self, prevScore):
+    def __init__(self, prevScore, highScore):
         super().__init__()
         
         self.prevScore = prevScore
+        self.highScore = highScore
         
         self.setImage("Beach.png")
         self.response = "Quit"
@@ -187,12 +198,19 @@ class Instructions(simpleGE.Scene):
         self.lblScore.text = "Last Score: 0"
         self.lblScore.center = (320,400)
         
+        self.lblHighScore = simpleGE.Label()
+        self.lblHighScore.text = "Last Score: 0"
+        self.lblHighScore.center = (320,360)
+        
         self.lblScore.text = f"Last score: {self.prevScore}"
+        
+        self.lblHighScore.text = f"High score: {self.highScore}"
         
         self.sprites = [self.directions,
                         self.btnPlay,
                         self.btnQuit,
-                        self.lblScore]
+                        self.lblScore,
+                        self.lblHighScore]
     
     
     def process(self):
@@ -208,15 +226,18 @@ def main():
     
     keepGoing = True
     lastScore = 0
+    highScore = 0
     
     while keepGoing:
-        instructions = Instructions(lastScore)
+        instructions = Instructions(lastScore, highScore)
         instructions.start()
         
         if instructions.response == "Play":
-            game = Game()
+            game = Game(highScore)
             game.start()
             lastScore = game.score
+            if lastScore > highScore:
+                highScore = lastScore
         else:
             keepGoing = False
     
