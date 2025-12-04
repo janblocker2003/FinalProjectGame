@@ -85,7 +85,7 @@ class LblHighScore(simpleGE.Label):
         super().__init__()
         self.highScore = highScore
         self.text = f"High Score: {self.highScore}"
-        self.center = (100, 50)
+        self.center = (100, 70)
 
 class LblTime(simpleGE.Label):
     def __init__(self):
