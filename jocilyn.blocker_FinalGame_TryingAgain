@@ -1,4 +1,4 @@
-import pygame, simpleGE, random
+import pygame, simpleGE, random, csv
 
 """ it's raining men 1-6 steps
     Build your roster!
@@ -227,6 +227,17 @@ def main():
     keepGoing = True
     lastScore = 0
     highScore = 0
+    try:
+        fileIn = open('savedHighScore.csv', 'r')
+        data = csv.reader(fileIn)
+        for row in data:
+            entry == row[0]
+            int(entry) == entry
+            int(highScore) == highScore
+            if entry > highScore:
+                highScore == entry
+    except:
+        highScore = 0
     
     while keepGoing:
         instructions = Instructions(lastScore, highScore)
@@ -238,6 +249,10 @@ def main():
             lastScore = game.score
             if lastScore > highScore:
                 highScore = lastScore
+                fileIn = open('savedHighScore.csv', 'w', newline = '')
+                data = csv.writer(fileIn)
+                data.writerow([highScore])
+                fileIn.close()
         else:
             keepGoing = False
     
