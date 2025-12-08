@@ -1,0 +1,298 @@
+import pygame, simpleGE, random, csv
+
+""" it's raining men 1-6 steps
+    Build your roster!
+"""
+
+class Men(simpleGE.Sprite):
+    def __init__(self, scene):
+        super().__init__(scene)
+        #self.setImage("Men.png")
+        self.images = {
+            "man":   pygame.image.load("Men.png"),
+            "woman":  pygame.image.load("girl.png"),
+            "satyr":  pygame.image.load("SatyrPic.png")}
+        self.copyImage(self.images["woman"])
+        self.setSize(30, 45)
+        self.reset()
+        
+    def reset(self):
+        whichWayToday = random.randint(0, 2)
+        if whichWayToday == 0:
+            self.copyImage(self.images["man"])
+        if whichWayToday == 1:
+            self.copyImage(self.images["woman"])
+        if whichWayToday == 2:
+            self.copyImage(self.images["satyr"])
+        self.y = 10
+        self.x = random.randint(0, self.screenWidth)
+        self.dy = random.randint(3, 8)
+        self.setSize(30, 45)
+        
+    def checkBounds(self):
+        if self.bottom > self.screenHeight:
+            self.reset()
+    
+#     def process(self):
+#         self.copyImage(self.images["man"])
+#         whichWayToday = random.randint(0, 2)
+#         if whichWayToday == 0:
+#             self.copyImage(self.images["man"])
+#         if whichWayToday == 1:
+#             self.copyImage(self.images["woman"])
+#         if whichWayToday == 2:
+#             self.copyImage(self.images["satyr"])
+            
+class BadGuy(simpleGE.Sprite):
+    def __init__(self,scene):
+        super().__init__(scene)
+        self.setImage("BadGuy.png")
+        self.setSize(30, 35)
+        self.reset()
+    
+    def reset(self):
+        self.y = 10
+        self.x = random.randint(0, self.screenWidth)
+        self.dy = random.randint(3, 8)
+    
+    def checkBounds(self):
+        if self.bottom > self.screenHeight:
+            self.reset()
+            
+class MoreTime(simpleGE.Sprite):
+    def __init__(self, scene):
+        super().__init__(scene)
+        self.setImage("clock.png")
+        self.setSize(25, 25)
+        self.reset()
+        
+    def reset(self):
+        self.y = 10
+        self.x = random.randint(0, self.screenWidth)
+        self.dy = random.randint(4, 8)
+    
+    def checkBounds(self):
+        if self.bottom > self.screenHeight:
+            self.reset()
+
+class Guy(simpleGE.Sprite):
+    def __init__(self, scene):
+        super().__init__(scene)
+        self.images = {
+            "left":   pygame.image.load("GuyLeftSmall.gif"),
+            "right":  pygame.image.load("GuyRightSmall.gif")}
+        self.setSize(35, 45)
+        self.position = (320, 400)
+        self.moveSpeed = 7
+        self.copyImage(self.images["right"])
+    
+    def process(self):
+        self.copyImage(self.images["right"])
+        if self.isKeyPressed(pygame.K_LEFT):
+            self.x -= self.moveSpeed
+            self.copyImage(self.images["left"])
+            
+        if self.isKeyPressed(pygame.K_RIGHT):
+            self.x += self.moveSpeed
+            self.copyImage(self.images["right"])
+            
+
+class LblScore(simpleGE.Label):
+    def __init__(self):
+        super().__init__()
+        self.text = "Score: 0"
+        self.center = (100, 30)
+
+class LblHighScore(simpleGE.Label):
+    def __init__(self, highScore):
+        super().__init__()
+        self.highScore = highScore
+        self.text = f"High Score: {self.highScore}"
+        self.center = (100, 70)
+
+class LblTime(simpleGE.Label):
+    def __init__(self):
+        super().__init__()
+        self.text = "Time left: 10"
+        self.center = (500, 30)
+
+class Game(simpleGE.Scene):
+    def __init__(self, highScore):
+        super().__init__()
+        self.setImage("Beach.png")
+        
+        #self.sndMen = simpleGE.Sound("DohSound.wav")
+        SOUNDS = {
+            "0": ["DohSound.wav"],
+            "1": ["beso.mp3"],
+            "2": ["gotcha.ogg"],
+            "3": ["ohYeah.wav"]
+            }
+        currentInt = random.randint(0, 3)
+        currentInt = str(currentInt)
+        self.currentInt = currentInt
+        self.sndMen = simpleGE.Sound(SOUNDS[f"{self.currentInt}"][0])
+        self.numMens = 10
+        
+        self.numBadGuys = 3
+        self.sndBadGuy = simpleGE.Sound("rock_breaking.flac")
+        
+        self.numMoreTimes = 1
+        self.sndMoreTime = simpleGE.Sound("alarm.ogg")
+        
+        self.score = 0
+        self.lblScore = LblScore()
+        self.highScore = highScore
+        self.lblHighScore = LblHighScore(highScore)
+        
+        self.timer = simpleGE.Timer()
+        self.timer.totalTime = 20
+        self.lblTime = LblTime()
+        
+        self.guy = Guy(self)
+        
+        self.mens = []
+        for i in range(self.numMens):
+            self.mens.append(Men(self))
+            
+        self.badGuys = []
+        for i in range(self.numBadGuys):
+            self.badGuys.append(BadGuy(self))
+        
+        self.moreTimes = []
+        for i in range(self.numMoreTimes):
+            self.moreTimes.append(MoreTime(self))
+        
+        self.sprites = [self.guy,
+                        self.mens,
+                        self.lblScore,
+                        self.lblTime,
+                        self.badGuys,
+                        self.moreTimes,
+                        self.lblHighScore]
+
+    def process(self):
+        for men in self.mens:
+            if men.collidesWith(self.guy):
+                self.currentInt = random.randint(0, 3)
+                self.currentInt = str(self.currentInt)
+                self.sndMen.play()
+                men.reset()
+                self.score += 1
+                self.lblScore.text = f"Score: {self.score}"
+        
+        for badGuy in self.badGuys:
+            if badGuy.collidesWith(self.guy):
+                self.sndBadGuy.play()
+                badGuy.reset()
+                self.score -= 1
+                self.lblScore.text = f"Score: {self.score}"
+        
+        for moreTime in self.moreTimes:
+            if moreTime.collidesWith(self.guy):
+                self.sndMoreTime.play()
+                moreTime.reset()
+                self.timer.totalTime += 2
+                self.lblTime.text = f"Time Left: {self.timer.getTimeLeft():.2f}"
+        
+        self.lblTime.text = f"Time Left: {self.timer.getTimeLeft():.2f}"
+        if self.timer.getTimeLeft() < 0:
+            self.stop()
+
+class Instructions(simpleGE.Scene):
+    def __init__(self, prevScore, highScore):
+        super().__init__()
+        
+        self.prevScore = prevScore
+        self.highScore = highScore
+        
+        self.setImage("Beach.png")
+        #self.setImage(self, key.png, autoSize = False)
+        self.response = "Quit"
+        
+        self.directions = simpleGE.MultiLabel()
+        self.directions.textLines = [
+        "You are a guy on vacation.",
+        "Move with the left and right arrow keys.",
+        "Build your roster by catching as many men",
+        "as possible in your time provided. Catch",
+        "clocks for more time and avoid the old creeps!"
+        "",
+        "Good Luck!"]
+        
+        self.directions.center = (320, 200)
+        self.directions.size = (500, 250)
+            
+        
+        self.btnPlay = simpleGE.Button()
+        self.btnPlay.text = "Play"
+        self.btnPlay.center = (100, 400)
+        
+        self.btnQuit = simpleGE.Button()
+        self.btnQuit.text = "Quit"
+        self.btnQuit.center = (540, 400)
+        
+        self.lblScore = simpleGE.Label()
+        self.lblScore.text = "Last Score: 0"
+        self.lblScore.center = (320,400)
+        
+        self.lblHighScore = simpleGE.Label()
+        self.lblHighScore.text = "Last Score: 0"
+        self.lblHighScore.center = (320,360)
+        
+        self.lblScore.text = f"Last score: {self.prevScore}"
+        
+        self.lblHighScore.text = f"High score: {self.highScore}"
+        
+        self.sprites = [self.directions,
+                        self.btnPlay,
+                        self.btnQuit,
+                        self.lblScore,
+                        self.lblHighScore]
+    
+    
+    def process(self):
+        if self.btnPlay.clicked:
+            self.response = "Play"
+            self.stop()
+            
+        if self.btnQuit.clicked:
+            self.response = "Quit"
+            self.stop()
+
+def main():
+    
+    keepGoing = True
+    lastScore = 0
+    highScore = 0
+    try:
+        fileIn = open('savedHighScore.csv', 'r')
+        data = csv.reader(fileIn)
+        for row in data:
+            entry == row[0]
+            int(entry) == entry
+            int(highScore) == highScore
+            if entry > highScore:
+                highScore == entry
+    except:
+        highScore = 0
+    
+    while keepGoing:
+        instructions = Instructions(lastScore, highScore)
+        instructions.start()
+        
+        if instructions.response == "Play":
+            game = Game(highScore)
+            game.start()
+            lastScore = game.score
+            if lastScore > highScore:
+                highScore = lastScore
+                fileIn = open('savedHighScore.csv', 'w', newline = '')
+                data = csv.writer(fileIn)
+                data.writerow([highScore])
+                fileIn.close()
+        else:
+            keepGoing = False
+    
+if __name__ == "__main__":
+    main()
